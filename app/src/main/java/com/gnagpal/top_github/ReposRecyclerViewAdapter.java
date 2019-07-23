@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gnagpal.top_github.Model.Developer;
+import com.gnagpal.top_github.Model.User;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -18,11 +18,11 @@ import java.util.List;
 
 class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAdapter.RepoViewHolder>{
 
-    private static final String EXTRA_KEY_REPO_DETAIL = "key_repo_detail";
+    public static final String EXTRA_KEY_REPO_DETAIL = "key_repo_detail";
     Context context;
-    List<Developer> repos;
+    List<User> repos;
 
-    public ReposRecyclerViewAdapter(Context context, List<Developer> repos) {
+    public ReposRecyclerViewAdapter(Context context, List<User> repos) {
         this.context = context;
         this.repos = repos;
     }
@@ -37,14 +37,14 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
 
     @Override
     public void onBindViewHolder(@NonNull ReposRecyclerViewAdapter.RepoViewHolder repoViewHolder, int i) {
-        final Developer developer = repos.get(i);
+        final User user = repos.get(i);
 
-        repoViewHolder.bind(developer);
+        repoViewHolder.bind(user);
         repoViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, RepoDetailActivity.class);
-                intent.putExtra(EXTRA_KEY_REPO_DETAIL, (Serializable) developer);
+                intent.putExtra(EXTRA_KEY_REPO_DETAIL, (Serializable) user);
                 context.startActivity(intent);
             }
         });
@@ -68,14 +68,14 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
 
         }
 
-        public void bind(final Developer developer) {
-            userNameTextView.setText(developer.getUsername());
-            repoNameTextView.setText(developer.getRepo().getName());
-            Picasso.get().load(developer.getAvatar()).into(avatarImageView);
+        public void bind(final User user) {
+            userNameTextView.setText(user.getUsername());
+            repoNameTextView.setText(user.getRepo().getName());
+            Picasso.get().load(user.getAvatar()).into(avatarImageView);
         }
     }
 
     public interface RepoClickListener{
-        void onClick(Developer developer);
+        void onClick(User user);
     }
 }

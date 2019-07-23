@@ -3,7 +3,9 @@ package com.gnagpal.top_github.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Developer {
+import java.io.Serializable;
+
+public class User implements Serializable{
     @SerializedName("username")
     @Expose
     private String username;

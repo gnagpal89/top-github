@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.gnagpal.top_github.Model.Developer;
+import com.gnagpal.top_github.Model.User;
 import com.gnagpal.top_github.Network.ApiClient;
 import com.gnagpal.top_github.Network.RepoService;
 
@@ -31,7 +31,7 @@ public class ListActivity extends AppCompatActivity {
     AutoCompleteTextView actv;
     RecyclerView recyclerView;
     ReposRecyclerViewAdapter reposRecyclerViewAdapter;
-    List<Developer> repos = new ArrayList<>();
+    List<User> repos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +73,11 @@ public class ListActivity extends AppCompatActivity {
                 progress.show();
 
                 final RepoService repoService = ApiClient.getClient().create(RepoService.class);
-                Call<List<Developer>> call = repoService.getRepos(languages.get(position), "weekly");
+                Call<List<User>> call = repoService.getRepos(languages.get(position), "weekly");
 
-                call.enqueue(new Callback<List<Developer>>() {
+                call.enqueue(new Callback<List<User>>() {
                     @Override
-                    public void onResponse(Call<List<Developer>> call, Response<List<Developer>> response) {
+                    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                         progress.dismiss();
 
                         if(response.body()!=null){
@@ -89,7 +89,7 @@ public class ListActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<List<Developer>> call, Throwable t) {
+                    public void onFailure(Call<List<User>> call, Throwable t) {
                         progress.dismiss();
                         Toast.makeText(ListActivity.this, "Something unexpected occurred!", Toast.LENGTH_LONG).show();
                         Log.e("ListActivity", "Error getting repos");
