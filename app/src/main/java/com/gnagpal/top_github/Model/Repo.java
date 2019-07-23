@@ -3,7 +3,7 @@ package com.gnagpal.top_github.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-class Repo {
+public class Repo {
     @SerializedName("name")
     @Expose
     private String name;
