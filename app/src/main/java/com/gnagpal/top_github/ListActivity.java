@@ -1,11 +1,16 @@
 package com.gnagpal.top_github;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,16 +19,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import com.gnagpal.top_github.Model.User;
-import com.gnagpal.top_github.Network.ApiClient;
-import com.gnagpal.top_github.Network.RepoService;
+import com.gnagpal.top_github.ViewModels.RepoListViewModel;
+import com.gnagpal.top_github.ViewModels.ReposListViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ListActivity extends AppCompatActivity {
 
@@ -32,11 +33,16 @@ public class ListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ReposRecyclerViewAdapter reposRecyclerViewAdapter;
     List<User> repos = new ArrayList<>();
+    List<String> languages;
+    String selectedLanguage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
+        if(savedInstanceState!=null)
+        selectedLanguage = savedInstanceState.getString("language");
 
         initViews();
         populateData();
@@ -55,7 +61,7 @@ public class ListActivity extends AppCompatActivity {
 
     private void populateData() {
 
-        final List<String> languages = Arrays.asList(getResources().getStringArray(R.array.languages_array));
+        languages = Arrays.asList(getResources().getStringArray(R.array.languages_array));
 
         adapter = new ArrayAdapter<>
                 (this, android.R.layout.select_dialog_item, languages);
@@ -64,39 +70,51 @@ public class ListActivity extends AppCompatActivity {
         actv.setAdapter(adapter);
         actv.setTextColor(Color.RED);
 
+        if(!TextUtils.isEmpty(selectedLanguage)){
+            observeViewModel(selectedLanguage);
+        }
+
         actv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final ProgressDialog progress = new ProgressDialog(ListActivity.this);
-                progress.setMessage("Fetching repos...");
-                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-                progress.show();
+//                final ProgressDialog progress = new ProgressDialog(ListActivity.this);
+//                progress.setMessage("Fetching users...");
+//                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+//                progress.show();
 
-                final RepoService repoService = ApiClient.getClient().create(RepoService.class);
-                Call<List<User>> call = repoService.getRepos(languages.get(position), "weekly");
+                if(TextUtils.isEmpty(selectedLanguage)){
+                    selectedLanguage = languages.get(position);
+                }
 
-                call.enqueue(new Callback<List<User>>() {
-                    @Override
-                    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                        progress.dismiss();
+                observeViewModel(selectedLanguage);
 
-                        if(response.body()!=null){
-                            repos = response.body();
-                            ReposRecyclerViewAdapter adapter = new ReposRecyclerViewAdapter(ListActivity.this, repos);
-                            recyclerView.setAdapter(adapter);
+            }
+        });
 
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(Call<List<User>> call, Throwable t) {
-                        progress.dismiss();
-                        Toast.makeText(ListActivity.this, "Something unexpected occurred!", Toast.LENGTH_LONG).show();
-                        Log.e("ListActivity", "Error getting repos");
-                    }
-                });
+    }
+
+    void observeViewModel(String language){
+        final RepoListViewModel repoListViewModel =
+                ViewModelProviders.of(ListActivity.this, new ReposListViewModelFactory(getApplication(), language))
+                        .get(RepoListViewModel.class);
+
+        repoListViewModel.getUsers(selectedLanguage).observe(ListActivity.this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                if(users!=null){
+                    ReposRecyclerViewAdapter adapter = new ReposRecyclerViewAdapter(ListActivity.this, users);
+                    recyclerView.setAdapter(adapter);
+                }
             }
         });
     }
 
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("language", selectedLanguage);
+    }
 }

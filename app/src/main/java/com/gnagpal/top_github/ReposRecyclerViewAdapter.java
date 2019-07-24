@@ -20,11 +20,11 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
 
     public static final String EXTRA_KEY_REPO_DETAIL = "key_repo_detail";
     Context context;
-    List<User> repos;
+    List<User> users;
 
-    public ReposRecyclerViewAdapter(Context context, List<User> repos) {
+    public ReposRecyclerViewAdapter(Context context, List<User> users) {
         this.context = context;
-        this.repos = repos;
+        this.users = users;
     }
 
     @NonNull
@@ -37,7 +37,7 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
 
     @Override
     public void onBindViewHolder(@NonNull ReposRecyclerViewAdapter.RepoViewHolder repoViewHolder, int i) {
-        final User user = repos.get(i);
+        final User user = users.get(i);
 
         repoViewHolder.bind(user);
         repoViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -52,7 +52,7 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
 
     @Override
     public int getItemCount() {
-        return repos.size();
+        return users.size();
     }
 
     class RepoViewHolder extends RecyclerView.ViewHolder{
