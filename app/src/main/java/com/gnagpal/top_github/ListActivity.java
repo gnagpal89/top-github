@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.gnagpal.top_github.Model.DataWrapper;
 import com.gnagpal.top_github.Model.User;
 import com.gnagpal.top_github.ViewModels.RepoListViewModel;
 import com.gnagpal.top_github.ViewModels.ReposListViewModelFactory;
@@ -87,11 +88,8 @@ public class ListActivity extends AppCompatActivity {
                 }
 
                 observeViewModel(selectedLanguage);
-
             }
         });
-
-
     }
 
     void observeViewModel(String language){
@@ -99,11 +97,15 @@ public class ListActivity extends AppCompatActivity {
                 ViewModelProviders.of(ListActivity.this, new ReposListViewModelFactory(getApplication(), language))
                         .get(RepoListViewModel.class);
 
-        repoListViewModel.getUsers(selectedLanguage).observe(ListActivity.this, new Observer<List<User>>() {
+
+        repoListViewModel.getUsers(selectedLanguage).observe(ListActivity.this, new Observer<DataWrapper>() {
             @Override
-            public void onChanged(@Nullable List<User> users) {
-                if(users!=null){
-                    ReposRecyclerViewAdapter adapter = new ReposRecyclerViewAdapter(ListActivity.this, users);
+            public void onChanged(@Nullable DataWrapper usersWrapper) {
+                if(usersWrapper.getError()!=null){
+                    Log.e("ListActivity", "Error getting users");
+                    Toast.makeText(ListActivity.this, "Error getting users", Toast.LENGTH_LONG).show();
+                } else {
+                    ReposRecyclerViewAdapter adapter = new ReposRecyclerViewAdapter(ListActivity.this, usersWrapper.getUsers());
                     recyclerView.setAdapter(adapter);
                 }
             }
@@ -114,7 +116,6 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putString("language", selectedLanguage);
     }
 }
