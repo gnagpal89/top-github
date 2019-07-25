@@ -3,7 +3,6 @@ package com.gnagpal.top_github.Network;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.gnagpal.top_github.Model.DataWrapper;
-import com.gnagpal.top_github.Model.Repo;
 import com.gnagpal.top_github.Model.User;
 
 import java.util.List;
@@ -14,17 +13,9 @@ import retrofit2.Response;
 
 public class ReposRepository {
 
-    private static ReposRepository reposRepository;
     private RepoService repoService;
 
-    public static ReposRepository getInstance(){
-        if(reposRepository == null){
-            reposRepository = new ReposRepository();
-        }
-        return reposRepository;
-    }
-
-    private ReposRepository(){
+    public ReposRepository(){
         repoService = ApiClient.getClient().create(RepoService.class);
     }
 
@@ -35,12 +26,12 @@ public class ReposRepository {
         repoService.getRepos(language, "weekly").enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                users.setValue(new DataWrapper(response.body()));
+                users.postValue(new DataWrapper(response.body()));
             }
 
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
-                users.setValue(new DataWrapper(t));
+                users.postValue(new DataWrapper(t));
             }
         });
         return users;

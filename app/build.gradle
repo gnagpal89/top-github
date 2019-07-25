@@ -21,6 +21,10 @@ android {
             buildConfigField "String", "GITHUB_ENDPOINT", '"https://github-trending-api.now.sh"'
         }
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {

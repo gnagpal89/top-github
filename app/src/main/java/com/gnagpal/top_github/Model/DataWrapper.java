@@ -5,7 +5,6 @@ import java.util.List;
 public class DataWrapper {
     private List<User> users;
     private Throwable error;
-    private boolean isLoading;
 
     public DataWrapper(List<User> users) {
         this.users = users;

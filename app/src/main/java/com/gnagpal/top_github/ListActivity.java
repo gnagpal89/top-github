@@ -1,8 +1,6 @@
 package com.gnagpal.top_github;
 
-import android.app.ProgressDialog;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
@@ -21,7 +19,6 @@ import android.widget.Toast;
 import com.gnagpal.top_github.Model.DataWrapper;
 import com.gnagpal.top_github.Model.User;
 import com.gnagpal.top_github.ViewModels.RepoListViewModel;
-import com.gnagpal.top_github.ViewModels.ReposListViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +30,7 @@ public class ListActivity extends AppCompatActivity {
     AutoCompleteTextView actv;
     RecyclerView recyclerView;
     ReposRecyclerViewAdapter reposRecyclerViewAdapter;
-    List<User> repos = new ArrayList<>();
+    List<User> users = new ArrayList<>();
     List<String> languages;
     String selectedLanguage;
 
@@ -52,12 +49,10 @@ public class ListActivity extends AppCompatActivity {
 
     private void initViews() {
 
-        //Getting the instance of AutoCompleteTextView
         actv = findViewById(R.id.autoCompleteTextView_languages);
         recyclerView = findViewById(R.id.rv_repos);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-
     }
 
     private void populateData() {
@@ -78,14 +73,8 @@ public class ListActivity extends AppCompatActivity {
         actv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                final ProgressDialog progress = new ProgressDialog(ListActivity.this);
-//                progress.setMessage("Fetching users...");
-//                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-//                progress.show();
 
-                if(TextUtils.isEmpty(selectedLanguage)){
-                    selectedLanguage = languages.get(position);
-                }
+                selectedLanguage = (String) parent.getItemAtPosition(position);
 
                 observeViewModel(selectedLanguage);
             }
@@ -93,25 +82,28 @@ public class ListActivity extends AppCompatActivity {
     }
 
     void observeViewModel(String language){
-        final RepoListViewModel repoListViewModel =
-                ViewModelProviders.of(ListActivity.this, new ReposListViewModelFactory(getApplication(), language))
+
+        RepoListViewModel repoListViewModel =
+                ViewModelProviders.of(ListActivity.this)
                         .get(RepoListViewModel.class);
 
+        repoListViewModel.setLanguage(language);
 
-        repoListViewModel.getUsers(selectedLanguage).observe(ListActivity.this, new Observer<DataWrapper>() {
+        repoListViewModel.getUsers().observe(ListActivity.this, new Observer<DataWrapper>() {
             @Override
             public void onChanged(@Nullable DataWrapper usersWrapper) {
                 if(usersWrapper.getError()!=null){
                     Log.e("ListActivity", "Error getting users");
                     Toast.makeText(ListActivity.this, "Error getting users", Toast.LENGTH_LONG).show();
                 } else {
+
                     ReposRecyclerViewAdapter adapter = new ReposRecyclerViewAdapter(ListActivity.this, usersWrapper.getUsers());
                     recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
                 }
             }
         });
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
