@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gnagpal.top_github.ImageCaching.ImageLoader;
 import com.gnagpal.top_github.Model.User;
 import com.squareup.picasso.Picasso;
 
@@ -22,9 +23,12 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
     Context context;
     List<User> users;
 
+    ImageLoader imageLoader;
+
     public ReposRecyclerViewAdapter(Context context, List<User> users) {
         this.context = context;
         this.users = users;
+        imageLoader = new ImageLoader(context.getApplicationContext());
     }
 
     @NonNull
@@ -71,7 +75,9 @@ class ReposRecyclerViewAdapter extends RecyclerView.Adapter<ReposRecyclerViewAda
         public void bind(final User user) {
             userNameTextView.setText(user.getUsername());
             repoNameTextView.setText(user.getRepo().getName());
-            Picasso.get().load(user.getAvatar()).into(avatarImageView);
+//            avatarImageView.setImageBitmap(Utility.getBitmap(user.getAvatar()));
+            imageLoader.DisplayImage(user.getAvatar(), avatarImageView);
+//            Picasso.get().load(user.getAvatar()).into(avatarImageView);
         }
     }
 

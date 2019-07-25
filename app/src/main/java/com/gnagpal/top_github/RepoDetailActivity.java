@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gnagpal.top_github.ImageCaching.ImageLoader;
 import com.gnagpal.top_github.Model.User;
 import com.squareup.picasso.Picasso;
 
@@ -16,6 +17,7 @@ public class RepoDetailActivity extends AppCompatActivity {
     User user;
     TextView repoDetailView, repoUrlView, userNameView, repoNameView, userUrlView, nameView;
     ImageView avatarView;
+    ImageLoader imageLoader;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class RepoDetailActivity extends AppCompatActivity {
     }
 
     private void populateViews() {
+        imageLoader = new ImageLoader(getApplicationContext());
+
         if(user!=null){
             repoDetailView.setText(user.getRepo().getDescription());
             repoUrlView.setText(user.getRepo().getUrl());
@@ -47,7 +51,9 @@ public class RepoDetailActivity extends AppCompatActivity {
             nameView.setText(user.getName());
             userNameView.setText(user.getUsername());
             userUrlView.setText(user.getUrl());
-            Picasso.get().load(user.getAvatar()).into(avatarView);
+//            Picasso.get().load(user.getAvatar()).into(avatarView);
+
+            imageLoader.DisplayImage(user.getAvatar(), avatarView);
 
         }
     }
